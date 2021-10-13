@@ -5,6 +5,8 @@ import java.util.List;
 
 public class Dijkstraalgo {
 
+  List<Node> graph = new ArrayList<>();
+
   public static class Node {
     public Node(String name) {
       this.name = name;
@@ -30,6 +32,18 @@ public class Dijkstraalgo {
     public void setCost(int cost) {
       this.cost = cost;
     }
+
+    @Override
+    public String toString() {
+      return node.name +
+              " cost=" + cost;
+    }
+  }
+
+  public Node createNode(String n) {
+    Node node = new Node(n);
+    graph.add(node);
+    return node;
   }
 
   public void addConnection(Node n, Node z, int cost) {
@@ -72,14 +86,21 @@ public class Dijkstraalgo {
     }
   }
 
+  public void drawConnections() {
+    for (Node n : graph) {
+      System.out.println(n.name + " ->" + n.connections);
+    }
+  }
+
   public static void main(String[] args) {
     Dijkstraalgo graph = new Dijkstraalgo();
-    Node a = new Node("a");
-    Node b = new Node("b");
-    Node c = new Node("c");
-    Node d = new Node("d");
-    Node e = new Node("e");
-    Node f = new Node("f");
+
+    Node a = graph.createNode("a");
+    Node b = graph.createNode("b");
+    Node c = graph.createNode("c");
+    Node d = graph.createNode("d");
+    Node e = graph.createNode("e");
+    Node f = graph.createNode("f");
 
     graph.addConnection(a, b, 9);
     graph.addConnection(a, d, 5);
@@ -88,5 +109,6 @@ public class Dijkstraalgo {
     graph.addConnection(d, e, 2);
     graph.addConnection(e, f, 8);
     graph.addConnection(f, c, 3);
+    graph.drawConnections();
   }
 }
