@@ -37,17 +37,14 @@ public class Dijkstraalgo {
   }
 
   public Connection searchConnection(Node n, Node z) {
-    if (n.costs == null) {
-      return null;
-    } else {
-      for (Connection s : n.getCosts()) {
-        if (s.node.equals(z)) {
-          return s;
-        } else {
-          return null;
-        }
+    for (Connection s : n.getCosts()) {
+      if (s.node.equals(z)) {
+        return s;
+      } else {
+        return null;
       }
     }
+    return null;
   }
 
   public void deleteConnection(Node n, Node z) {
