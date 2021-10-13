@@ -8,13 +8,12 @@ public class Dijkstraalgo {
   List<Node> nodes = new ArrayList<>();
 
   public static class Node {
-    public Node(String name, List<Cost> costs) {
+    public Node(String name) {
       this.name = name;
-      this.costs = costs;
     }
 
-    String name;
-    List<Cost> costs;
+    public final String name;
+    public final List<Cost> costs = new ArrayList<>();
   }
 
   public static class Cost {
@@ -23,8 +22,8 @@ public class Dijkstraalgo {
       this.cost = cost;
     }
 
-    Node node;
-    int cost;
+    public final Node node;
+    public final int cost;
   }
 
   public void addNode(){
