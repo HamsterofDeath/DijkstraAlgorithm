@@ -16,8 +16,8 @@ public class Dijkstraalgo {
       return connections;
     }
 
-    String name;
-    List<Connection> connections = new ArrayList<>();
+    public final String name;
+    public final List<Connection> connections = new ArrayList<>();
   }
 
   public static class Connection {
@@ -26,8 +26,8 @@ public class Dijkstraalgo {
       this.cost = cost;
     }
 
-    Node node;
-    int cost;
+    public final Node node;
+    public int cost;
 
     public void setCost(int cost) {
       this.cost = cost;

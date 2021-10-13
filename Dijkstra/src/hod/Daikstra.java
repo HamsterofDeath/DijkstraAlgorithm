@@ -49,7 +49,7 @@ public class Daikstra {
             }
             node2ShortestPathEnd.put(basedOn, this);
 
-            for (Dijkstraalgo.Cost cost : node.costs) {
+            for (Dijkstraalgo.Connection cost : node.connections) {
                 if (node2ShortestPathEnd.containsKey(cost.node)) {
                     final EnhancedNode knownNode = node2ShortestPathEnd.get(cost.node);
                     knownNode.testNewPath(cost);
@@ -61,7 +61,7 @@ public class Daikstra {
             }
         }
 
-        private void testNewPath(final Dijkstraalgo.Cost alternative) {
+        private void testNewPath(final Dijkstraalgo.Connection alternative) {
             if (alternative.cost + baseCost < totalCost) {
                 var source = node2ShortestPathEnd.get(cameFrom.basedOn);
                 final EnhancedNode nodeToConsider = new EnhancedNode(alternative.node);
