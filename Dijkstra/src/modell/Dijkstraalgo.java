@@ -10,12 +10,12 @@ public class Dijkstraalgo {
       this.name = name;
     }
 
-    public List<Connection> getCosts() {
-      return costs;
+    public List<Connection> getConnections() {
+      return connections;
     }
 
     String name;
-    List<Connection> costs = new ArrayList<>();
+    List<Connection> connections = new ArrayList<>();
   }
 
   public static class Connection {
@@ -33,32 +33,39 @@ public class Dijkstraalgo {
   }
 
   public void addConnection(Node n, Node z, int cost) {
-    n.getCosts().add(new Connection(z, cost));
+    n.getConnections().add(new Connection(z, cost));
+    z.getConnections().add(new Connection(n, cost));
   }
 
   public Connection searchConnection(Node n, Node z) {
-    for (Connection s : n.getCosts()) {
+    for (Connection s : n.getConnections()) {
       if (s.node.equals(z)) {
         return s;
-      } else {
-        return null;
       }
     }
     return null;
   }
 
   public void deleteConnection(Node n, Node z) {
-    Connection c = searchConnection(n, z);
-    if (c != null) {
-      n.getCosts().remove(c);
+    Connection c1 = searchConnection(n, z);
+    Connection c2 = searchConnection(z, n);
+    if (c1 != null) {
+      n.getConnections().remove(c1);
+      z.getConnections().remove(c2);
     }
   }
 
   public void changeCostOfConnection(Node n, Node z, int newCost) {
-    Connection c = searchConnection(n, z);
-    if (c != null) {
-      for (Connection s : n.getCosts()) {
-        if (s.equals(c)) {
+    Connection c1 = searchConnection(n, z);
+    Connection c2 = searchConnection(z, n);
+    if (c1 != null) {
+      for (Connection s : n.getConnections()) {
+        if (s.equals(c1)) {
+          s.setCost(newCost);
+        }
+      }
+      for (Connection s : z.getConnections()) {
+        if (s.equals(c2)) {
           s.setCost(newCost);
         }
       }
@@ -66,6 +73,19 @@ public class Dijkstraalgo {
   }
 
   public static void main(String[] args) {
-    Dijkstraalgo path = new Dijkstraalgo();
+    Dijkstraalgo graph = new Dijkstraalgo();
+    Node a = new Node("a");
+    Node b = new Node("b");
+    Node c = new Node("c");
+    Node d = new Node("d");
+    Node e = new Node("e");
+    Node f = new Node("f");
+
+    graph.addConnection(a, b, 9);
+    graph.addConnection(a, c, 5);
+
+    graph.addConnection(a, b, 9);
+    graph.addConnection(a, b, 9);
+    graph.addConnection(a, b, 9);
   }
 }
