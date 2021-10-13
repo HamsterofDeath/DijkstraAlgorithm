@@ -82,10 +82,11 @@ public class Dijkstraalgo {
     Node f = new Node("f");
 
     graph.addConnection(a, b, 9);
-    graph.addConnection(a, c, 5);
-
-    graph.addConnection(a, b, 9);
-    graph.addConnection(a, b, 9);
-    graph.addConnection(a, b, 9);
+    graph.addConnection(a, d, 5);
+    graph.addConnection(b, c, 3);
+    graph.addConnection(b, e, 1);
+    graph.addConnection(d, e, 2);
+    graph.addConnection(e, f, 8);
+    graph.addConnection(f, c, 3);
   }
 }
