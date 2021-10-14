@@ -9,13 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 public class Daikstra {
-    private Dijkstraalgo.Node start;
-    private Dijkstraalgo.Node goal;
+    private final Dijkstraalgo.Node start;
 
-    public Daikstra(final Dijkstraalgo.Node start, final Dijkstraalgo.Node goal) {
+    public Daikstra(final Dijkstraalgo.Node start) {
         this.start = start;
-        this.goal = goal;
-        new EnhancedNode(start);
+        new EnhancedNode(start, 0, null);
     }
 
     public List<EnhancedNode> pathTo(Dijkstraalgo.Node goal) {
@@ -33,48 +31,56 @@ public class Daikstra {
 
     }
 
-    private Map<Dijkstraalgo.Node, EnhancedNode> node2ShortestPathEnd = new HashMap<>();
+    private final Map<Dijkstraalgo.Node, EnhancedNode> node2ShortestPathEnd = new HashMap<>();
 
     public class EnhancedNode {
-        public final  Dijkstraalgo.Node       basedOn;
-        public        int                     totalCost = 0;
-        public        int                     baseCost  = 0;
-        public        EnhancedNode            cameFrom;
-        private final List<Dijkstraalgo.Node> seen      = new ArrayList<>();
+        public final Dijkstraalgo.Node basedOn;
+        public final int               costToReach;
+        public       EnhancedNode      cameFrom;
 
-        public EnhancedNode(final Dijkstraalgo.Node node) {
-            this.basedOn = node;
+        @Override
+        public String toString() {
+            return "EnhancedNode{" +
+                   "basedOn=" + basedOn +
+                   ", totalCost=" + costToReach +
+                   '}';
+        }
+
+        public EnhancedNode(final Dijkstraalgo.Node me, final int costToReach,
+                            final EnhancedNode previous) {
+            this.basedOn = me;
+            this.cameFrom = previous;
             if (node2ShortestPathEnd.containsKey(basedOn)) {
                 throw new IllegalStateException();
             }
             node2ShortestPathEnd.put(basedOn, this);
+            this.costToReach = costToReach;
 
-            for (Dijkstraalgo.Connection cost : node.connections) {
-                if (node2ShortestPathEnd.containsKey(cost.node)) {
-                    final EnhancedNode knownNode = node2ShortestPathEnd.get(cost.node);
-                    knownNode.testNewPath(cost);
+            for (Dijkstraalgo.Connection connection : me.connections) {
+                if (node2ShortestPathEnd.containsKey(connection.node)) {
+                    final EnhancedNode knownNode = node2ShortestPathEnd.get(connection.node);
+                    knownNode.testNewPath(connection, this);
                 } else {
-                    final EnhancedNode nodeToConsider = new EnhancedNode(cost.node);
-                    nodeToConsider.init(this, totalCost + cost.cost);
-                    node2ShortestPathEnd.put(cost.node, nodeToConsider);
+                    final EnhancedNode
+                            nodeToConsider =
+                            new EnhancedNode(connection.node, costToReach + connection.cost, this);
+                    node2ShortestPathEnd.put(nodeToConsider.basedOn, nodeToConsider);
                 }
             }
         }
 
-        private void testNewPath(final Dijkstraalgo.Connection alternative) {
-            if (alternative.cost + baseCost < totalCost) {
-                var source = node2ShortestPathEnd.get(cameFrom.basedOn);
-                final EnhancedNode nodeToConsider = new EnhancedNode(alternative.node);
-                nodeToConsider.init(source, baseCost + alternative.cost);
+        private void testNewPath(final Dijkstraalgo.Connection alternativePath,
+                                 final EnhancedNode alternativeSource) {
+            final int alternativeCost = alternativePath.cost + alternativeSource.costToReach;
+            if (alternativeCost < costToReach) {
+                node2ShortestPathEnd.remove(alternativePath.node);
+                final EnhancedNode
+                        nodeToConsider =
+                        new EnhancedNode(alternativePath.node, alternativeCost, alternativeSource);
                 node2ShortestPathEnd.put(basedOn, nodeToConsider);
             }
         }
 
-        private void init(final EnhancedNode cameFrom, final int totalCost) {
-            this.cameFrom = cameFrom;
-            this.baseCost = cameFrom.totalCost;
-            this.totalCost = totalCost;
-        }
 
         public List<EnhancedNode> buildPath() {
             var path = new ArrayList<EnhancedNode>();
@@ -89,7 +95,10 @@ public class Daikstra {
     }
 
     public static void main(String[] args) {
-
+        var g = Dijkstraalgo.createDemoGraph();
+        var daik = new Daikstra(g.getNode("A"));
+        var path = daik.pathTo(g.getNode("F"));
+        System.out.println(path);
     }
 
 }

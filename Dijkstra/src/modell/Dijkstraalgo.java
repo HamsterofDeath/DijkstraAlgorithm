@@ -2,10 +2,20 @@ package modell;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 public class Dijkstraalgo {
 
   List<Node> graph = new ArrayList<>();
+
+  public Node getNode(final String name) {
+    return graph
+            .stream()
+            .filter(node -> name.equalsIgnoreCase(node.name))
+            .findAny()
+            .orElseThrow();
+  }
 
   public static class Node {
     public Node(String name) {
@@ -18,6 +28,26 @@ public class Dijkstraalgo {
 
     public final String name;
     public final List<Connection> connections = new ArrayList<>();
+
+    @Override
+    public boolean equals(final Object o) {
+      if (this == o) return true;
+      if (!(o instanceof Node)) return false;
+      final Node node = (Node) o;
+      return Objects.equals(name, node.name);
+    }
+
+    @Override
+    public String toString() {
+      return "Node{" +
+             "name='" + name + '\'' +
+             '}';
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(name);
+    }
   }
 
   public static class Connection {
@@ -93,6 +123,11 @@ public class Dijkstraalgo {
   }
 
   public static void main(String[] args) {
+    Dijkstraalgo graph = createDemoGraph();
+    graph.drawConnections();
+  }
+
+  public static Dijkstraalgo createDemoGraph() {
     Dijkstraalgo graph = new Dijkstraalgo();
 
     Node a = graph.createNode("a");
@@ -109,6 +144,6 @@ public class Dijkstraalgo {
     graph.addConnection(d, e, 2);
     graph.addConnection(e, f, 8);
     graph.addConnection(f, c, 3);
-    graph.drawConnections();
+    return graph;
   }
 }
