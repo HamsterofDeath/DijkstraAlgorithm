@@ -19,10 +19,15 @@ public class Daikstra {
     public List<EnhancedNode> pathTo(Dijkstraalgo.Node goal) {
         var cursor = goal;
         var path = new ArrayList<EnhancedNode>();
-        while (!cursor.equals(start)) {
+        while (cursor != null) {
             var enhanced = node2ShortestPathEnd.get(cursor);
+            if (cursor != start) {
+                cursor = enhanced.cameFrom.basedOn;
+            } else {
+                cursor = null;
+            }
             path.add(enhanced);
-            cursor = enhanced.cameFrom.basedOn;
+
         }
         Collections.reverse(path);
 
@@ -57,13 +62,14 @@ public class Daikstra {
             this.costToReach = costToReach;
 
             for (Dijkstraalgo.Connection connection : me.connections) {
-                if (node2ShortestPathEnd.containsKey(connection.node)) {
-                    final EnhancedNode knownNode = node2ShortestPathEnd.get(connection.node);
+                if (node2ShortestPathEnd.containsKey(connection.getNode())) {
+                    final EnhancedNode knownNode = node2ShortestPathEnd.get(connection.getNode());
                     knownNode.testNewPath(connection, this);
                 } else {
                     final EnhancedNode
                             nodeToConsider =
-                            new EnhancedNode(connection.node, costToReach + connection.cost, this);
+                            new EnhancedNode(connection.getNode(),
+                                             costToReach + connection.getCost(), this);
                     node2ShortestPathEnd.put(nodeToConsider.basedOn, nodeToConsider);
                 }
             }
@@ -71,12 +77,13 @@ public class Daikstra {
 
         private void testNewPath(final Dijkstraalgo.Connection alternativePath,
                                  final EnhancedNode alternativeSource) {
-            final int alternativeCost = alternativePath.cost + alternativeSource.costToReach;
+            final int alternativeCost = alternativePath.getCost() + alternativeSource.costToReach;
             if (alternativeCost < costToReach) {
-                node2ShortestPathEnd.remove(alternativePath.node);
+                node2ShortestPathEnd.remove(alternativePath.getNode());
                 final EnhancedNode
                         nodeToConsider =
-                        new EnhancedNode(alternativePath.node, alternativeCost, alternativeSource);
+                        new EnhancedNode(alternativePath.getNode(), alternativeCost,
+                                         alternativeSource);
                 node2ShortestPathEnd.put(basedOn, nodeToConsider);
             }
         }

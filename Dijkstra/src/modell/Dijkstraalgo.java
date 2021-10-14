@@ -56,8 +56,17 @@ public class Dijkstraalgo {
       this.cost = cost;
     }
 
-    public final Node node;
-    public int cost;
+    private final Node node;
+
+    public Node getNode() {
+      return node;
+    }
+
+    public int getCost() {
+      return cost;
+    }
+
+    private int cost;
 
     public void setCost(int cost) {
       this.cost = cost;
