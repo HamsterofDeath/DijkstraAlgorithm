@@ -12,8 +12,7 @@ import java.util.HashMap;
 
 public class DaikUtils {
 
-    public static final String mazeUrl = "https://i.ibb.co/zFPrv4c/amazeing.png";
-    public static final String mazeUrl2 = "https://i.ibb.co/b7Zk3vZ/amazeing.png";
+    public static final String mazeUrl = "https://i.ibb.co/zJ95xjw/amazeing.png";
 
     public static Dijkstraalgo fromImage(BufferedImage img) {
         var graph = new Dijkstraalgo();
