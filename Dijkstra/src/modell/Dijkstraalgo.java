@@ -56,6 +56,19 @@ public class Dijkstraalgo {
       this.cost = cost;
     }
 
+    @Override
+    public boolean equals(final Object o) {
+      if (this == o) return true;
+      if (!(o instanceof Connection)) return false;
+      final Connection that = (Connection) o;
+      return cost == that.cost && Objects.equals(node, that.node);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(node, cost);
+    }
+
     private final Node node;
 
     public Node getNode() {
@@ -86,8 +99,16 @@ public class Dijkstraalgo {
   }
 
   public void addConnection(Node n, Node z, int cost) {
-    n.getConnections().add(new Connection(z, cost));
-    z.getConnections().add(new Connection(n, cost));
+    final List<Connection> addFirstConnection = n.getConnections();
+    final Connection con1 = new Connection(z, cost);
+    if (!addFirstConnection.contains(con1)) {
+      addFirstConnection.add(con1);
+    }
+    final List<Connection> addSecondConnection = z.getConnections();
+    final Connection con2 = new Connection(n, cost);
+    if (!addSecondConnection.contains(con2)) {
+      addSecondConnection.add(con2);
+    }
   }
 
   public Connection searchConnection(Node n, Node z) {

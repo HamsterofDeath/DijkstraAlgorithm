@@ -99,6 +99,10 @@ public class Daikstra {
             Collections.reverse(path);
             return path;
         }
+
+        public String getName() {
+            return basedOn.name;
+        }
     }
 
     public static void main(String[] args) {
