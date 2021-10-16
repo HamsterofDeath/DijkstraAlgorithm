@@ -221,7 +221,11 @@ public class Dijkstraalgo {
   }
 
   private Path pathToZiel(List<Path> paths, Node ziel) {
-
+    for (Path a : paths) {
+      if (a.node.equals(ziel)) {
+        return a;
+      }
+    }
     return null;
   }
 
