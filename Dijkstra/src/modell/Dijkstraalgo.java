@@ -150,32 +150,6 @@ public class Dijkstraalgo {
     return null;
   }
 
-  public void deleteConnection(Node n, Node z) {
-    Connection c1 = searchConnection(n, z);
-    Connection c2 = searchConnection(z, n);
-    if (c1 != null) {
-      n.getConnections().remove(c1);
-      z.getConnections().remove(c2);
-    }
-  }
-
-  public void changeCostOfConnection(Node n, Node z, int newCost) {
-    Connection c1 = searchConnection(n, z);
-    Connection c2 = searchConnection(z, n);
-    if (c1 != null) {
-      for (Connection s : n.getConnections()) {
-        if (s.equals(c1)) {
-          s.setCost(newCost);
-        }
-      }
-      for (Connection s : z.getConnections()) {
-        if (s.equals(c2)) {
-          s.setCost(newCost);
-        }
-      }
-    }
-  }
-
   private BufferedImage getImage(String filename) {
     // This time, you can use an InputStream to load
     try {
