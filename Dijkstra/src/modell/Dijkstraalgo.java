@@ -253,7 +253,8 @@ public class Dijkstraalgo {
   private List<Path> createAnewPath(List<Path> optimisedPaths, Connection c, Path pathToStart) {
     List<Path> opti = new ArrayList<>(optimisedPaths);
     Path toC = new Path(c.node);
-    toC.setPath(pathToStart.getPath());
+    var copy = new ArrayList<>(pathToStart.getPath());
+    toC.setPath(copy);
     toC.getPath().add(c.node);
     toC.setGesamtCost(pathToStart.gesamtCost + c.cost);
     opti.add(toC);
