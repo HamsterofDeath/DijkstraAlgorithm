@@ -10,6 +10,11 @@ import javax.imageio.ImageIO;
 
 public class Dijkstraalgo {
 
+  // little explanation of the classes: each point is a node. Each node has a connection that
+  // contains the node it is connected with and the cost. There is also a path that contains the
+  // ziel node and a list of all the nodes that need to be traversed to each the ziel along with the
+  // total cost.
+
   List<Node> graph = new ArrayList<>();
 
   public Node getNode(final String name) {
@@ -194,84 +199,54 @@ public class Dijkstraalgo {
   public void imageToNodes() {}
 
   public Path myDijkstra(Node start, Node ziel) {
-    Path finalPath = null;
-    List<Path> paths = new ArrayList<>();
-    List<Node> nichtBearbeitet = new ArrayList<>(graph);
 
-    // TODO: the code for the first node is repetitive and can be included into the other part of
-    // the code
-    if (start != null && ziel != null) {
-      if (graph.contains(start) && graph.contains(ziel)) {
-        for (Node n : graph) {
-          if (n.equals(start)) {
-            // remove the start node, as we don't need to visit it
-            nichtBearbeitet.remove(start);
-            // create paths for every single node except the start
-            for (int i = 0; i < nichtBearbeitet.size(); i++) {
-              paths.add(new Path(nichtBearbeitet.get(i)));
-            }
-            // update the paths for the neighbors of the start node
-            for (int i = 0; i < n.connections.size(); i++) {
-              for (Path a : paths) {
-                if (start.connections.get(i).node.equals(a.node)) {
-                  a.getPath().add(n);
-                  a.setGesamtCost(n.connections.get(i).cost);
-                }
-              }
-            }
-            // TODO: Achtung, this code will have a problem if a node isn't connected to the others
-            while (nichtBearbeitet.size() >= 1) {
-              // compare the costs for the paths that haven't been optimized yet
-              Path minPath = pathWithMinCost(paths, nichtBearbeitet);
-              // remove the chosen node, as its path is now optimal
-              nichtBearbeitet.remove(minPath.node);
-              for (Path a : paths) {
-                if (minPath.getPath().contains(a.node) && nichtBearbeitet.contains(a.node)) {
-                  int costs = 0;
-                  // here I need to first compare the costs of the paths if bigger replace, if
-                  // smaller leave alone
-                  for (int i = 0; i < minPath.node.connections.size(); i++) {
-                    if (minPath.node.connections.get(i).node.equals(a.node)) {
-                      costs = minPath.node.connections.get(i).getCost();
-                    }
-                  }
-                  if (a.gesamtCost > (minPath.gesamtCost + costs)) {
-                    // change this here as well, it is minnode path + last node (should be
-                    // overriden you know?)
-                    a.setPath(minPath.getPath());
-                    a.getPath().add(minPath.node);
-                    // I need to add the cost of minNode as well
-                    a.setGesamtCost(minPath.gesamtCost + costs);
-                  }
-                }
-              }
-            }
-            for (Path a : paths) {
-              if (a.node.equals(ziel)) {
-                finalPath = a;
-              }
-            }
+    List<Path> paths = new ArrayList<>();
+    List<Node> nochNichtbearbeitet = new ArrayList<>(graph);
+
+    // Step 1: take the start and create paths for its neighbors
+    paths = createPathsNeighbors(start, paths);
+    nochNichtbearbeitet.remove(start);
+
+    // Step 2: compare all the paths whose nodes have not been bearbeitet and take the min
+    while (nochNichtbearbeitet.size() > 0) {
+      Path minPath = minCostPaths(paths, nochNichtbearbeitet);
+      // the case that the path to the goal is already found, we don't need to investigate the rest
+      if (minPath.node.equals(ziel)) {
+        return minPath;
+      }
+      nochNichtbearbeitet.remove(minPath.node);
+      paths = createPathsNeighbors(minPath.node, paths);
+    }
+    return pathToZiel(paths, ziel);
+  }
+
+  private Path pathToZiel(List<Path> paths, Node ziel) {
+
+    return null;
+  }
+
+  private Path minCostPaths(List<Path> paths, List<Node> nochNichtbearbeitet) {
+    Path minPath = null;
+    int cost = -1;
+    for (int i = 0; i < paths.size(); i++) {
+      if (nochNichtbearbeitet.contains(paths.get(i).node)) {
+        if (cost == -1) {
+          cost = paths.get(i).gesamtCost;
+          minPath = paths.get(i);
+        } else {
+          if (paths.get(i).gesamtCost < cost) {
+            cost = paths.get(i).gesamtCost;
+            minPath = paths.get(i);
           }
         }
       }
     }
-    return finalPath;
+    return minPath;
   }
 
-  private Path pathWithMinCost(List<Path> paths, List<Node> nichtBearbeitet) {
-    Path answer = null;
+  private List<Path> createPathsNeighbors(Node start, List<Path> paths) {
 
-    //TODO: fix this, if you ever can
-    for (Path a : paths) {
-      if (nichtBearbeitet.contains(a.node)) {
-        int min = a.gesamtCost;
-        if (a.gesamtCost < min) {
-          answer = a;
-          min = a.gesamtCost;
-        }
-      }
-    }
-    return answer;
+    return null;
   }
 
   public static void main(String[] args) {
