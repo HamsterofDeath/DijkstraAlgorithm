@@ -79,10 +79,11 @@ public class DaikUtils {
         var sample = fromImage(image);
         final Dijkstraalgo.Node upperLeft = sample.getNode(startX + "/" + startY);
         final Dijkstraalgo.Node lowerRight = sample.getNode(targetX + "/" + targetY);
-        var daik = new Daikstra(upperLeft);
+        var daik = Daikstra.createDaikstra(upperLeft, true);
         var path = daik.pathTo(lowerRight);
-        for (Daikstra.EnhancedNode node : path) {
-            var name = node.getName();
+        System.out.println("Cost: "+path.get(path.size()-1).cost());
+        for (SolutionNode node : path) {
+            var name = node.node().name;
             var split = name.split("/");
             var x = Integer.parseInt(split[0]);
             var y = Integer.parseInt(split[1]);
