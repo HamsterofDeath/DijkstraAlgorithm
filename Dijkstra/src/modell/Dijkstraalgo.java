@@ -1,20 +1,24 @@
 package modell;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
+import javax.imageio.ImageIO;
 
 public class Dijkstraalgo {
+
+  // little explanation of the classes: each point is a node. Each node has a connection that
+  // contains the node it is connected with and the cost. There is also a path that contains the
+  // ziel node and a list of all the nodes that need to be traversed to each the ziel along with the
+  // total cost.
 
   List<Node> graph = new ArrayList<>();
 
   public Node getNode(final String name) {
-    return graph
-            .stream()
-            .filter(node -> name.equalsIgnoreCase(node.name))
-            .findAny()
-            .orElseThrow();
+    return graph.stream().filter(node -> name.equalsIgnoreCase(node.name)).findAny().orElseThrow();
   }
 
   public static class Node {
@@ -39,9 +43,7 @@ public class Dijkstraalgo {
 
     @Override
     public String toString() {
-      return "Node{" +
-             "name='" + name + '\'' +
-             '}';
+      return "Node{" + "name='" + name + '\'' + '}';
     }
 
     @Override
@@ -87,8 +89,36 @@ public class Dijkstraalgo {
 
     @Override
     public String toString() {
-      return node.name +
-              " cost=" + cost;
+      return node.name + " cost=" + cost;
+    }
+  }
+
+  public class Path {
+    // the node is the goal, and the list is the path from start to goal
+
+    public Path(Node node) {
+      this.node = node;
+    }
+
+    @Override
+    public String toString() {
+      return "Path{" + "node=" + node.name + ", path=" + path + ", gesamtCost=" + gesamtCost + '}';
+    }
+
+    public List<Node> getPath() {
+      return path;
+    }
+
+    Node node;
+    List<Node> path = new ArrayList<>();
+    int gesamtCost;
+
+    public void setPath(List<Node> path) {
+      this.path = path;
+    }
+
+    public void setGesamtCost(int gesamtCost) {
+      this.gesamtCost = gesamtCost;
     }
   }
 
@@ -146,15 +176,84 @@ public class Dijkstraalgo {
     }
   }
 
+  private BufferedImage getImage(String filename) {
+    // This time, you can use an InputStream to load
+    try {
+      // Grab the InputStream for the image.
+      InputStream in = getClass().getResourceAsStream(filename);
+      // Then read it.
+      return ImageIO.read(in);
+    } catch (IOException e) {
+      System.out.println("The image was not loaded.");
+      // System.exit(1);
+    }
+    return null;
+  }
+
   public void drawConnections() {
     for (Node n : graph) {
       System.out.println(n.name + " ->" + n.connections);
     }
   }
 
+  public void imageToNodes() {}
+
+  public Path myDijkstra(Node start, Node ziel) {
+
+    List<Path> paths = new ArrayList<>();
+    List<Node> nochNichtbearbeitet = new ArrayList<>(graph);
+
+    // Step 1: take the start and create paths for its neighbors
+    paths = createPathsNeighbors(start, paths);
+    nochNichtbearbeitet.remove(start);
+
+    // Step 2: compare all the paths whose nodes have not been bearbeitet and take the min
+    while (nochNichtbearbeitet.size() > 0) {
+      Path minPath = minCostPaths(paths, nochNichtbearbeitet);
+      // the case that the path to the goal is already found, we don't need to investigate the rest
+      if (minPath.node.equals(ziel)) {
+        return minPath;
+      }
+      nochNichtbearbeitet.remove(minPath.node);
+      paths = createPathsNeighbors(minPath.node, paths);
+    }
+    return pathToZiel(paths, ziel);
+  }
+
+  private Path pathToZiel(List<Path> paths, Node ziel) {
+
+    return null;
+  }
+
+  private Path minCostPaths(List<Path> paths, List<Node> nochNichtbearbeitet) {
+    Path minPath = null;
+    int cost = -1;
+    for (int i = 0; i < paths.size(); i++) {
+      if (nochNichtbearbeitet.contains(paths.get(i).node)) {
+        if (cost == -1) {
+          cost = paths.get(i).gesamtCost;
+          minPath = paths.get(i);
+        } else {
+          if (paths.get(i).gesamtCost < cost) {
+            cost = paths.get(i).gesamtCost;
+            minPath = paths.get(i);
+          }
+        }
+      }
+    }
+    return minPath;
+  }
+
+  private List<Path> createPathsNeighbors(Node start, List<Path> paths) {
+
+    return null;
+  }
+
   public static void main(String[] args) {
     Dijkstraalgo graph = createDemoGraph();
     graph.drawConnections();
+    Path path = graph.myDijkstra(graph.getNode("a"), graph.getNode("f"));
+    System.out.println(path);
   }
 
   public static Dijkstraalgo createDemoGraph() {
