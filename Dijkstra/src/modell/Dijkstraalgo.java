@@ -176,10 +176,11 @@ public class Dijkstraalgo {
 
     List<Path> paths = new ArrayList<>();
     List<Node> nochNichtbearbeitet = new ArrayList<>(graph);
+    paths.add(initializePath(start));
 
     // Step 1: take the start and create paths for its neighbors
-    paths = createPathsNeighbors(start, paths);
     nochNichtbearbeitet.remove(start);
+    paths = createPathsNeighbors(start, paths);
 
     // Step 2: compare all the paths whose nodes have not been bearbeitet and take the min
     while (nochNichtbearbeitet.size() > 0) {
@@ -192,6 +193,13 @@ public class Dijkstraalgo {
       paths = createPathsNeighbors(minPath.node, paths);
     }
     return pathToZiel(paths, ziel);
+  }
+
+  private Path initializePath(Node start) {
+    Path starting = new Path(start);
+    starting.getPath().add(start);
+    starting.setGesamtCost(0);
+    return starting;
   }
 
   private Path pathToZiel(List<Path> paths, Node ziel) {
@@ -223,8 +231,65 @@ public class Dijkstraalgo {
   }
 
   private List<Path> createPathsNeighbors(Node start, List<Path> paths) {
+    List<Path> optimisedPaths = new ArrayList<>(paths);
+    // first extract the neighbors
+    List<Connection> neighbors = start.getConnections();
+    // now we check the paths to these connections and select the path with minimal cost
+    // case 1: the path already exists
+    for (Connection c : neighbors) {
+      Path pathToStart = pathForNode(start, paths);
+      if (pathForConnectionExists(c.node, paths)) {
+        Path pathForConn = pathForNode(c.node, paths);
+        if (pathForConn.gesamtCost > (pathToStart.gesamtCost + c.getCost())) {
+          optimisedPaths = optimisePaths(optimisedPaths, pathForConn, pathToStart, c.getCost());
+        }
+      } else {
+        optimisedPaths = createAnewPath(optimisedPaths, c, pathToStart);
+      }
+    }
+    return optimisedPaths;
+  }
 
+  private List<Path> createAnewPath(List<Path> optimisedPaths, Connection c, Path pathToStart) {
+    List<Path> opti = new ArrayList<>(optimisedPaths);
+    Path toC = new Path(c.node);
+    toC.setPath(pathToStart.getPath());
+    toC.getPath().add(c.node);
+    toC.setGesamtCost(pathToStart.gesamtCost + c.cost);
+    opti.add(toC);
+    return opti;
+  }
+
+  private boolean pathForConnectionExists(Node node, List<Path> paths) {
+    for (Path a : paths) {
+      if (a.node.equals(node)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private Path pathForNode(Node start, List<Path> paths) {
+    for (Path a : paths) {
+      if (a.node.equals(start)) {
+        return a;
+      }
+    }
     return null;
+  }
+
+  // I replace the pathForConn with pathtoStart + cost of the last connection
+  private List<Path> optimisePaths(
+      List<Path> optimisedPaths, Path pathForConn, Path pathToStart, int cost) {
+    List<Path> opti = new ArrayList<>(optimisedPaths);
+    for (Path a : opti) {
+      if (a.equals(pathForConn)) {
+        a.setPath(pathToStart.getPath());
+        a.getPath().add(a.node);
+        a.gesamtCost = pathToStart.gesamtCost + cost;
+      }
+    }
+    return opti;
   }
 
   public static void main(String[] args) {
