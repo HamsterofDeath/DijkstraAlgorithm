@@ -79,15 +79,15 @@ public class DaikUtils {
         var sample = fromImage(image);
         final Dijkstraalgo.Node upperLeft = sample.getNode(startX + "/" + startY);
         final Dijkstraalgo.Node lowerRight = sample.getNode(targetX + "/" + targetY);
-        var daik = Daikstra.createDaikstra(upperLeft, true);
+        var daik = Daikstra.createDaikstra(upperLeft);
         var path = daik.pathTo(lowerRight);
-        System.out.println("Cost: "+path.get(path.size()-1).cost());
+        System.out.println("Cost: " + path.get(path.size() - 1).cost());
         for (SolutionNode node : path) {
             var name = node.node().name;
             var split = name.split("/");
             var x = Integer.parseInt(split[0]);
             var y = Integer.parseInt(split[1]);
-            image.setRGB(x,y, Color.red.getRGB());
+            image.setRGB(x, y, Color.red.getRGB());
         }
         try {
             final File result = new File("solution.png");

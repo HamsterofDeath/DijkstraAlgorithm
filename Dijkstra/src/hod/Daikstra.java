@@ -2,7 +2,6 @@ package hod;
 
 import modell.Dijkstraalgo;
 
-import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -14,27 +13,19 @@ import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class Daikstra {
     private final Dijkstraalgo.Node                    start;
-    private final Map<Dijkstraalgo.Node, EnhancedNode> node2ShortestPathEnd = new HashMap<>();
+    private final Map<Dijkstraalgo.Node, EnhancedNode> node2ShortestPathEnd   = new HashMap<>();
     private final Map<Dijkstraalgo.Node, SolutionNode> node2ShortestPathEndV2 = new HashMap<>();
 
-    private Daikstra(final Dijkstraalgo.Node start, final boolean v2) {
+    private Daikstra(final Dijkstraalgo.Node start) {
         this.start = start;
-        if (v2) {
-            node2ShortestPathEndV2.putAll(new DaikV2(start).getSolutions());
-        } else {
-            new EnhancedNode(start, 0, null);
-            node2ShortestPathEnd.forEach((node, enhanced) -> node2ShortestPathEndV2.put(node, enhanced.toSimple()));
-            node2ShortestPathEnd.clear();
-
-        }
+        node2ShortestPathEndV2.putAll(new DaikV2(start).getSolutions());
     }
 
-    public static Daikstra createDaikstra(final Dijkstraalgo.Node start, final boolean v2) {
-        return new Daikstra(start, v2);
+    public static Daikstra createDaikstra(final Dijkstraalgo.Node start) {
+        return new Daikstra(start);
     }
 
     public List<SolutionNode> pathTo(Dijkstraalgo.Node goal) {
@@ -107,38 +98,15 @@ public class Daikstra {
         }
 
 
-        public List<EnhancedNode> buildPath() {
-            var path = new ArrayList<EnhancedNode>();
-            var pointer = this;
-            while (pointer != null) {
-                path.add(pointer);
-                pointer = pointer.cameFrom;
-            }
-            Collections.reverse(path);
-            return path;
-        }
-
         public String getName() {
             return basedOn.name;
         }
-
-        public SolutionNode toSimple() {
-            return new SolutionNode(basedOn, costToReach, cameFrom==null?null:cameFrom.basedOn);
-        }
     }
-
-    public static void main(String[] args) {
-        var g = Dijkstraalgo.createDemoGraph();
-        var daik = createDaikstra(g.getNode("A"), true);
-        var path = daik.pathTo(g.getNode("F"));
-        System.out.println(path);
-    }
-
 }
 
 record SolutionNode(Dijkstraalgo.Node node, int cost, Dijkstraalgo.Node cameFrom) {
 
-};
+}
 
 class DaikV2 {
 
@@ -148,11 +116,11 @@ class DaikV2 {
     }
 
     private final Queue<TempNode>
-                                                   open  =
+                                                       open      =
             new PriorityQueue<>(Comparator.comparingInt(o -> o.costUntilHere));
-    private final Map<Dijkstraalgo.Node, TempNode> paths = new HashMap<>();
+    private final Map<Dijkstraalgo.Node, TempNode>     paths     = new HashMap<>();
     private final Map<Dijkstraalgo.Node, SolutionNode> solutions = new HashMap<>();
-    private final Set<Dijkstraalgo.Node> seen = new HashSet<>();
+    private final Set<Dijkstraalgo.Node>               seen      = new HashSet<>();
 
     public DaikV2(final Dijkstraalgo.Node start) {
         final TempNode origin = new TempNode(start, null, 0);
@@ -169,34 +137,37 @@ class DaikV2 {
                     .getConnections()
                     .stream()
                     .flatMap(connection ->
-                         {
-                             final Dijkstraalgo.Node target = connection.getNode();
-                             final int totalCost = here.costUntilHere() + connection.getCost();
-                             if (paths.containsKey(target)) {
-                                var known = paths.get(target);
-                                 if (known.costUntilHere <= totalCost) {
-                                    return Optional.<TempNode>empty().stream();
+                             {
+                                 final Dijkstraalgo.Node target = connection.getNode();
+                                 final int totalCost = here.costUntilHere() + connection.getCost();
+                                 if (paths.containsKey(target)) {
+                                     var known = paths.get(target);
+                                     if (known.costUntilHere <= totalCost) {
+                                         return Optional.<TempNode>empty().stream();
+                                     } else {
+                                         final Dijkstraalgo.Node base = here.node();
+                                         seen.add(base);
+                                         return Optional.of(new TempNode(target, base, totalCost))
+                                                 .stream();
+                                     }
                                  } else {
                                      final Dijkstraalgo.Node base = here.node();
-                                     seen.add(base);
-                                     return Optional.of(new TempNode(target, base, totalCost)).stream();
-                                 }
-                             } else {
-                                 final Dijkstraalgo.Node base = here.node();
-                                 var addMe = new TempNode(target, base, totalCost);
-                                 if (!seen.contains(target)) {
-                                     seen.add(target);
-                                     return Optional.of(addMe).stream();
-                                 } else {
-                                     return Optional.<TempNode>empty().stream();
+                                     var addMe = new TempNode(target, base, totalCost);
+                                     if (!seen.contains(target)) {
+                                         seen.add(target);
+                                         return Optional.of(addMe).stream();
+                                     } else {
+                                         return Optional.<TempNode>empty().stream();
+                                     }
                                  }
                              }
-                         }
                     );
             final List<TempNode> addUs = todo.toList();
             open.addAll(addUs);
         }
-        paths.forEach((node, tempNode) -> solutions.put(node, new SolutionNode(tempNode.node, tempNode.costUntilHere(),tempNode.previous())));
+        paths.forEach((node, tempNode) -> solutions.put(node, new SolutionNode(tempNode.node,
+                                                                               tempNode.costUntilHere(),
+                                                                               tempNode.previous())));
         paths.clear();
     }
 
