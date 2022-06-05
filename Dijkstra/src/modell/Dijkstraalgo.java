@@ -49,41 +49,20 @@ public class Dijkstraalgo {
         }
     }
 
-    public static class Connection {
-        public Connection(Node node, int cost) {
-            this.node = node;
-            this.cost = cost;
-        }
+    public record Connection(Node node, int cost) {
 
         @Override
-        public boolean equals(final Object o) {
-            if (this == o) return true;
-            if (!(o instanceof final Connection that)) return false;
-            return cost == that.cost && Objects.equals(node, that.node);
-        }
+            public boolean equals(final Object o) {
+                if (this == o) return true;
+                if (!(o instanceof final Connection that)) return false;
+                return cost == that.cost && Objects.equals(node, that.node);
+            }
 
         @Override
-        public int hashCode() {
-            return Objects.hash(node, cost);
+            public String toString() {
+                return node.name + " cost=" + cost;
+            }
         }
-
-        private final Node node;
-
-        public Node getNode() {
-            return node;
-        }
-
-        public int getCost() {
-            return cost;
-        }
-
-        private final int cost;
-
-        @Override
-        public String toString() {
-            return node.name + " cost=" + cost;
-        }
-    }
 
     public Node createNode(String n) {
         Node node = new Node(n);

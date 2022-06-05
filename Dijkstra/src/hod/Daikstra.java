@@ -71,14 +71,14 @@ public class Daikstra {
             this.costToReach = costToReach;
 
             for (Dijkstraalgo.Connection connection : me.connections) {
-                if (node2ShortestPathEnd.containsKey(connection.getNode())) {
-                    final EnhancedNode knownNode = node2ShortestPathEnd.get(connection.getNode());
+                if (node2ShortestPathEnd.containsKey(connection.node())) {
+                    final EnhancedNode knownNode = node2ShortestPathEnd.get(connection.node());
                     knownNode.testNewPath(connection, this);
                 } else {
                     final EnhancedNode
                             nodeToConsider =
-                            new EnhancedNode(connection.getNode(),
-                                             costToReach + connection.getCost(), this);
+                            new EnhancedNode(connection.node(),
+                                             costToReach + connection.cost(), this);
                     node2ShortestPathEnd.put(nodeToConsider.basedOn, nodeToConsider);
                 }
             }
@@ -86,12 +86,12 @@ public class Daikstra {
 
         private void testNewPath(final Dijkstraalgo.Connection alternativePath,
                                  final EnhancedNode alternativeSource) {
-            final int alternativeCost = alternativePath.getCost() + alternativeSource.costToReach;
+            final int alternativeCost = alternativePath.cost() + alternativeSource.costToReach;
             if (alternativeCost < costToReach) {
-                node2ShortestPathEnd.remove(alternativePath.getNode());
+                node2ShortestPathEnd.remove(alternativePath.node());
                 final EnhancedNode
                         nodeToConsider =
-                        new EnhancedNode(alternativePath.getNode(), alternativeCost,
+                        new EnhancedNode(alternativePath.node(), alternativeCost,
                                          alternativeSource);
                 node2ShortestPathEnd.put(basedOn, nodeToConsider);
             }
@@ -138,8 +138,8 @@ class DaikV2 {
                     .stream()
                     .flatMap(connection ->
                              {
-                                 final Dijkstraalgo.Node target = connection.getNode();
-                                 final int totalCost = here.costUntilHere() + connection.getCost();
+                                 final Dijkstraalgo.Node target = connection.node();
+                                 final int totalCost = here.costUntilHere() + connection.cost();
                                  if (paths.containsKey(target)) {
                                      var known = paths.get(target);
                                      if (known.costUntilHere <= totalCost) {
